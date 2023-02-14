@@ -90,8 +90,9 @@ class RepVGGBlock(nn.Module):
         self.nonlinearity = nn.ReLU()
 
         # 引入通道注意力机制
+        # RepVGG的注意力机制模块在非线性激活函数前使用 RepVGGPlus的注意力机制模块在非线性激活函数后使用
+        #   Note that RepVGG-D2se uses SE before nonlinearity. But RepVGGplus models uses SE after nonlinearity.
         if use_se:
-            #   Note that RepVGG-D2se uses SE before nonlinearity. But RepVGGplus models uses SE after nonlinearity.
             self.se = SEBlock(out_channels, internal_neurons=out_channels // 16)
         else:
             self.se = nn.Identity()

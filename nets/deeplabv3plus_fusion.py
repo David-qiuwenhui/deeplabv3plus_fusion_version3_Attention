@@ -408,7 +408,7 @@ class BasicBlockNew(nn.Module):
             )
         )  # 使用了逐通道卷积
 
-        # 引入通道注意力机制
+        # Inverted Bottleneck 引入通道注意力机制
         if use_se:
             layers.append(SqueezeExcitation(input_c=expanded_planes, squeeze_factor=4))
         layers.append(
@@ -914,12 +914,12 @@ def deeplabv3plus_fusion_backbone():
         baseblock_use_hs=False,
         baseblock_use_se=False,
         deploy=False,
-        repvgg_use_se=False,
+        repvgg_use_se=True,
     )
 
     bneck_conf = partial(InvertedResidualConfig, width_multi=model_cfg["width_multi"])
     # 定义Stage1模块倒残差模块的参数 InvertedResidualConfig
-    # in_planes, expanded_planes, out_planes, kernel, stride, activation, use_se, width_multi
+    # in_planes, expanded_planes, out_planes, kernel, stride, activation, use_se
     stage1_setting = [
         bneck_conf(32, 96, 32, 3, 1, "RE", False),
         # bneck_conf(32, 128, 32, 3, 1, "RE", False),
