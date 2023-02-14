@@ -1,0 +1,15 @@
+# ignore cache file
+__pycache__/
+
+# ingore predict img and dataset
+img_out/
+miou_out_train/
+miou_out_val/
+miou_out_*/
+
+# ingore model weights 
+model_data/
+*.pth
+
+# system
+*.DS_Store
