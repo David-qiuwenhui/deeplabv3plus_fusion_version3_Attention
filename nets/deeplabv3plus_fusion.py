@@ -11,7 +11,7 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 from torch.nn import functional as F
-
+from nets.attention_modules.cbam_block import cbam_block
 from nets.mobilevit_block import MobileViTBlock
 
 
@@ -153,10 +153,14 @@ class RepVGGplusBlock(nn.Module):
         self.nonlinearity = nn.ReLU()
         # self.nonlinearity = nn.ReLU6()
 
+        # TODO: 主干特征提取网络backbone中的注意力机制模块
         # 引入通道注意力机制
         # RepVGGPlus的SE通道注意力模块在非线性激活模块后使用
         if use_post_se:
-            self.post_se = SEBlock(out_channels, internal_neurons=out_channels // 4)
+            self.post_se = cbam_block(
+                channel=out_channels, ratio=4, kernel_size=7, min_planes=16
+            )
+            # self.post_se = SEBlock(out_channels, internal_neurons=out_channels // 4)
         else:
             self.post_se = nn.Identity()
 
@@ -551,7 +555,7 @@ class StageModule(nn.Module):
         for i in range(self.input_branches):  # 每个分支上都先通过4个BasicBlock
             w = c * (2**i)  # 对应第i个分支的通道数
             # TODO: 修改了stage1到stage4的patch_w和patch_h
-            patch_size_list = [16, 8, 4, 2]
+            patch_size_list = [8, 4, 2, 1]
             patch_size = patch_size_list[i]
             branch = nn.Sequential(
                 BasicBlockNew(
@@ -568,7 +572,7 @@ class StageModule(nn.Module):
                 MobileViTBlock(
                     in_channels=w,
                     transformer_dim=w,
-                    ffn_dim=w * 2,
+                    ffn_dim=w * 3,
                     n_transformer_blocks=1,
                     head_dim=w // 4,
                     attn_dropout=0.0,
@@ -726,14 +730,14 @@ class DeepLabV3PlusFusion(nn.Module):
             MobileViTBlock(
                 in_channels=32,
                 transformer_dim=32,
-                ffn_dim=64,
+                ffn_dim=96,
                 n_transformer_blocks=1,
                 head_dim=8,
                 attn_dropout=0.0,
                 dropout=0.1,
                 ffn_dropout=0.0,
-                patch_h=16,
-                patch_w=16,
+                patch_h=8,
+                patch_w=8,
                 conv_ksize=3,
             ),
         )
