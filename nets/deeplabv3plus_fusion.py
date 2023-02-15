@@ -12,6 +12,7 @@ from torch import Tensor
 import torch.nn as nn
 from torch.nn import functional as F
 from nets.attention_modules.cbam_block import cbam_block
+from nets.attention_modules.ecanet_block import eca_block
 from nets.mobilevit_block import MobileViTBlock
 
 
@@ -157,9 +158,10 @@ class RepVGGplusBlock(nn.Module):
         # 引入通道注意力机制
         # RepVGGPlus的SE通道注意力模块在非线性激活模块后使用
         if use_post_se:
-            self.post_se = cbam_block(
-                channel=out_channels, ratio=4, kernel_size=7, min_planes=16
-            )
+            self.post_se = eca_block(channel=out_channels)
+            # self.post_se = cbam_block(
+            #     channel=out_channels, ratio=4, kernel_size=7
+            # )
             # self.post_se = SEBlock(out_channels, internal_neurons=out_channels // 4)
         else:
             self.post_se = nn.Identity()

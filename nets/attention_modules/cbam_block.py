@@ -8,13 +8,12 @@ import torch.nn as nn
 
 
 class ChannelAttention(nn.Module):
-    def __init__(self, in_planes, ratio=8, min_planes=16):
+    def __init__(self, in_planes, ratio=8):
         super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)  # 全局自适应平均池化
         self.max_pool = nn.AdaptiveMaxPool2d(1)  # 全局自适应最大池化
 
-        mid_channels = max(min_planes, in_planes // ratio)
-
+        mid_channels = in_planes // ratio
         # 利用1x1卷积代替全连接
         self.fc1 = nn.Conv2d(in_planes, mid_channels, 1, bias=False)
         self.relu1 = nn.ReLU()
@@ -57,11 +56,9 @@ class SpatialAttention(nn.Module):
 
 
 class cbam_block(nn.Module):
-    def __init__(self, channel, ratio=8, kernel_size=7, min_planes=16):
+    def __init__(self, channel, ratio=8, kernel_size=7):
         super(cbam_block, self).__init__()
-        self.channelattention = ChannelAttention(
-            in_planes=channel, ratio=ratio, min_planes=min_planes
-        )
+        self.channelattention = ChannelAttention(in_planes=channel, ratio=ratio)
         self.spatialattention = SpatialAttention(kernel_size=kernel_size)
 
     def forward(self, x):
