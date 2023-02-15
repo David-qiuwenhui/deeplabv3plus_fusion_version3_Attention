@@ -20,7 +20,7 @@ val_cfg = dict(
     # ---------- 卷积模型的参数 ----------
     # best_epoch_weights.pth
     # last_epoch_weights.pth
-    model_path="./logs/deeplabv3plus_fusion/05_DeepLabV3Plus_fusion_version2_MobileVit_d4_Normal_500epochs_bs16_adam/ep500-loss0.236-val_loss0.460.pth",
+    model_path="./logs/deeplabv3plus_fusion/01_deeplabv3plus_fusion_version3_MobileVit_d4_Normal_senet_500epochs_bs16_adam/last_epoch_weights.pth",
     backbone="deeplabv3plus_fusion",
     aux_branch=False,
     num_classes=7,
@@ -39,8 +39,8 @@ val_cfg = dict(
     cuda=True,
     # ---------- 文件夹的位置参数 ----------
     dataset_path="../../dataset/SUIMdevkit",
-    file_name="train.txt",
-    save_file_dir="./miou_out_train_500",
+    file_name="val.txt",
+    save_file_dir="./miou_out_val_last",
 )
 
 
