@@ -344,7 +344,6 @@ class DeepLab(nn.Module):
             outputs = self.backbone(x)
             (
                 conv1_features,
-                conv2_features,
                 stage1_features,
                 stage2_features,
                 stage3_features,
@@ -352,7 +351,6 @@ class DeepLab(nn.Module):
                 x,
             ) = (
                 outputs.conv1,
-                outputs.conv2,
                 outputs.stage1,
                 outputs.stage2,
                 outputs.stage3,

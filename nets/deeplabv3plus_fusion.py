@@ -11,8 +11,10 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 from torch.nn import functional as F
-from nets.attention_modules.cbam_block import cbam_block
-from nets.attention_modules.ecanet_block import eca_block
+from nets.attention_modules.CBAM_block import cbam_block
+from nets.attention_modules.DANet_block import DAModule
+from nets.attention_modules.ECANet_block import eca_block
+from nets.attention_modules.SK_block import SKAttention
 from nets.mobilevit_block import MobileViTBlock
 
 
@@ -158,7 +160,9 @@ class RepVGGplusBlock(nn.Module):
         # 引入通道注意力机制
         # RepVGGPlus的SE通道注意力模块在非线性激活模块后使用
         if use_post_se:
-            self.post_se = eca_block(channel=out_channels)
+            self.post_se = SKAttention(
+                channel=out_channels, kernels=[5, 7, 9], reduction=8
+            )
             # self.post_se = cbam_block(
             #     channel=out_channels, ratio=4, kernel_size=7
             # )
@@ -556,7 +560,6 @@ class StageModule(nn.Module):
         self.branches = nn.ModuleList()
         for i in range(self.input_branches):  # 每个分支上都先通过4个BasicBlock
             w = c * (2**i)  # 对应第i个分支的通道数
-            # TODO: 修改了stage1到stage4的patch_w和patch_h
             patch_size_list = [8, 4, 2, 1]
             patch_size = patch_size_list[i]
             branch = nn.Sequential(
@@ -688,7 +691,7 @@ class DeepLabV3PlusFusion(nn.Module):
         baseblock_use_hs=False,
         baseblock_use_se=False,
         deploy=False,
-        repvgg_use_se=False,
+        repvgg_use_se=[False, False, False, False],
     ):
         super().__init__()
 
@@ -700,7 +703,6 @@ class DeepLabV3PlusFusion(nn.Module):
             baseblock_use_hs=baseblock_use_hs,
             baseblock_use_se=baseblock_use_se,
             deploy=deploy,
-            repvgg_use_se=repvgg_use_se,
         )
         # ******************** Conv1 ********************
         self.conv1 = ConvBNActivation(
@@ -724,11 +726,10 @@ class DeepLabV3PlusFusion(nn.Module):
                     cnf.use_hs,
                     cnf.use_se,
                     deploy=deploy,
-                    repvgg_use_se=repvgg_use_se,
+                    repvgg_use_se=repvgg_use_se[0],
                 )
             )
         stage1.append(
-            # TODO: 修改了stage1的patch_w和patch_h
             MobileViTBlock(
                 in_channels=32,
                 transformer_dim=32,
@@ -777,7 +778,9 @@ class DeepLabV3PlusFusion(nn.Module):
 
         # ******************** Stage2 ********************
         self.stage2 = nn.Sequential(
-            DeepLabStageModule(input_branches=2, output_branches=2),
+            DeepLabStageModule(
+                input_branches=2, output_branches=2, repvgg_use_se=repvgg_use_se[1]
+            ),
         )
 
         # ******************** Transition2 ********************
@@ -805,8 +808,7 @@ class DeepLabV3PlusFusion(nn.Module):
         # ******************** Stage3 ********************
         self.stage3 = nn.Sequential(
             DeepLabStageModule(
-                input_branches=3,
-                output_branches=3,
+                input_branches=3, output_branches=3, repvgg_use_se=repvgg_use_se[2]
             ),
         )
 
@@ -837,8 +839,7 @@ class DeepLabV3PlusFusion(nn.Module):
         # 注意，最后一个StageModule只输出分辨率最高的特征层
         self.stage4 = nn.Sequential(
             DeepLabStageModule(
-                input_branches=4,
-                output_branches=1,
+                input_branches=4, output_branches=1, repvgg_use_se=repvgg_use_se[3]
             ),
         )
 
@@ -891,13 +892,12 @@ class DeepLabV3PlusFusion(nn.Module):
 
         Outputs = namedtuple(
             "outputs",
-            ["main", "conv1", "conv2", "stage1", "stage2", "stage3", "stage4"],
+            ["main", "conv1", "stage1", "stage2", "stage3", "stage4"],
         )
 
         return Outputs(
             main=x[0],
             conv1=conv1_features,
-            conv2=conv2_features,
             stage1=stage1_features,
             stage2=stage2_features,
             stage3=stage3_features,
@@ -913,6 +913,7 @@ class DeepLabV3PlusFusion(nn.Module):
 
 def deeplabv3plus_fusion_backbone():
     # hrnet_w18, hrnet_w32, hrnet_w48
+    # TODO: 修改注意力机制的放置位置
     model_cfg = dict(
         base_channel=32,
         width_multi=1.0,
@@ -920,7 +921,7 @@ def deeplabv3plus_fusion_backbone():
         baseblock_use_hs=False,
         baseblock_use_se=False,
         deploy=False,
-        repvgg_use_se=True,
+        repvgg_use_se=[False, False, True, False],
     )
 
     bneck_conf = partial(InvertedResidualConfig, width_multi=model_cfg["width_multi"])
