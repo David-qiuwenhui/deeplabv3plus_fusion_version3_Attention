@@ -14,10 +14,10 @@ from utils.utils import time_synchronized
 pred_cfg = dict(
     # ---------- 预测模式的参数 ----------
     # predict, dir_predict, fps, video
-    mode="fps",  # predict, dir_predict, fps, video
+    mode="dir_predict",  # predict, dir_predict, fps, video
     mix_type=0,  # 0混合, 1仅原图, 2仅原图中的目标_扣去背景
     # ---------- 深度卷积神经网络模型的超参数 ----------
-    model_path="./logs/deeplabv3plus_fusion/01_deeplabv3plus_fusion_version3_MobileVit_d4_Normal_senet_500epochs_bs16_adam/last_epoch_weights.pth",
+    model_path="./logs/deeplabv3plus_fusion/02_deeplabv3plus_fusion_version3_MobileVit_d4_Normal_sknet_500epochs_bs16_adam/best_epoch_weights.pth",
     backbone="deeplabv3plus_fusion",
     input_shape=[512, 512],
     downsample_factor=4,
