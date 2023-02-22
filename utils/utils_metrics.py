@@ -148,7 +148,9 @@ def compute_mIoU(gt_dir, pred_dir, png_name_list, num_classes, name_classes=None
     print(
         "===> mIoU: "
         + str(round(np.nanmean(IoUs) * 100, 2))
-        + "; mPA: "
+        + "; mPrecision: "
+        + str(round(np.nanmean(Precision) * 100, 2))
+        + "; mRecall: "
         + str(round(np.nanmean(PA_Recall) * 100, 2))
         + "; Accuracy: "
         + str(round(per_Accuracy(hist) * 100, 2))
@@ -211,16 +213,16 @@ def show_results(
     )
     print("Save mIoU out to " + os.path.join(miou_out_path, "mIoU.png"))
 
-    draw_plot_func(
-        PA_Recall,
-        name_classes,
-        "mPA = {0:.2f}%".format(np.nanmean(PA_Recall) * 100),
-        "Pixel Accuracy",
-        os.path.join(miou_out_path, "mPA.png"),
-        tick_font_size=tick_font_size,
-        plt_show=False,
-    )
-    print("Save mPA out to " + os.path.join(miou_out_path, "mPA.png"))
+    # draw_plot_func(
+    #     PA_Recall,
+    #     name_classes,
+    #     "mPA = {0:.2f}%".format(np.nanmean(PA_Recall) * 100),
+    #     "Pixel Accuracy",
+    #     os.path.join(miou_out_path, "mPA.png"),
+    #     tick_font_size=tick_font_size,
+    #     plt_show=False,
+    # )
+    # print("Save mPA out to " + os.path.join(miou_out_path, "mPA.png"))
 
     draw_plot_func(
         PA_Recall,

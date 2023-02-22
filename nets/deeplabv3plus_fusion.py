@@ -12,6 +12,7 @@ from torch import Tensor
 import torch.nn as nn
 from torch.nn import functional as F
 from nets.attention_modules.BAM_block import BAMBlock
+from nets.attention_modules.CBAM_SC_block import cbam_sc_block
 from nets.attention_modules.CBAM_block import cbam_block
 from nets.attention_modules.DANet_block import DAModule
 from nets.attention_modules.ECANet_block import eca_block
@@ -162,13 +163,14 @@ class RepVGGplusBlock(nn.Module):
         # 引入通道注意力机制
         # RepVGGPlus的SE通道注意力模块在非线性激活模块后使用
         if use_post_se:
-            self.post_se = scSE(in_channels=out_channels, squeeze_rate=2)
+            # self.post_se = cbam_sc_block(channel=out_channels, ratio=8, kernel_size=7)
+            # self.post_se = scSE(in_channels=out_channels, squeeze_rate=2)
             # self.post_se = BAMBlock(
             #     channel=out_channels, reduction=8, kernel=3, dia_val=[1, 2, 3]
             # )
-            # self.post_se = SKAttention(
-            #     channel=out_channels, kernels=[5, 7, 9], reduction=8
-            # )
+            self.post_se = SKAttention(
+                channel=out_channels, kernels=[5, 7, 9], reduction=8
+            )
             # self.post_se = cbam_block(
             #     channel=out_channels, ratio=4, kernel_size=7
             # )
@@ -927,8 +929,8 @@ def deeplabv3plus_fusion_backbone():
         baseblock_use_hs=False,
         baseblock_use_se=False,
         deploy=False,
-        repvgg_use_se=[True, True, True, True],
-        # repvgg_use_se=[False, False, True, False],
+        repvgg_use_se=[False, False, True, False],
+        # repvgg_use_se=[True, True, True, True],
     )
 
     bneck_conf = partial(InvertedResidualConfig, width_multi=model_cfg["width_multi"])

@@ -56,9 +56,7 @@ class ConvBNActivation(nn.Sequential):
 #   利用不同膨胀率的膨胀卷积进行特征提取
 # -----------------------------------------#
 class ASPP(nn.Module):
-    def __init__(
-        self, dim_in, dim_out, rate=1, bn_mom=0.1
-    ):  # dim_in=2048, dim_out=256, rate=2
+    def __init__(self, dim_in, dim_out, rate=1, bn_mom=0.1):
         super(ASPP, self).__init__()
         # Conv1x1 branch
         self.branch1 = nn.Sequential(
@@ -223,7 +221,7 @@ class DeepLab(nn.Module):
         # -----------------------------------------#
         self.aspp = ASPP(
             dim_in=in_channels, dim_out=aspp_channels, rate=16 // downsample_factor
-        )  # dim_in=2048 dim_out=256 rate=2
+        )
 
         # ----------------------------------#
         #   浅、中层特征图的卷积传递层
