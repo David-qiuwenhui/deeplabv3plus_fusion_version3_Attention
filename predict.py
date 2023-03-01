@@ -101,7 +101,7 @@ def main(pred_cfg):
 
     elif mode == "dir_predict":
         import os
-        from tqdm import tqdm
+        from rich.progress import track
 
         # -------------------------------------------------------------------------#
         #   dir_origin_path     指定了用于检测的图片的文件夹路径
@@ -114,7 +114,7 @@ def main(pred_cfg):
         dir_save_path = pred_cfg["dir_save_path"]
 
         img_names = os.listdir(dir_origin_path)
-        for img_name in tqdm(img_names):
+        for img_name in track(img_names):
             if img_name.lower().endswith(
                 (
                     ".bmp",

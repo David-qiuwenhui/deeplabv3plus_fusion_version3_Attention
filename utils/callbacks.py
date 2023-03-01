@@ -13,7 +13,8 @@ import shutil
 import numpy as np
 
 from PIL import Image
-from tqdm import tqdm
+from rich.progress import track
+
 from torch.utils.tensorboard import SummaryWriter
 from .utils import cvtColor, preprocess_input, resize_image
 from .utils_metrics import compute_mIoU
@@ -200,7 +201,7 @@ class EvalCallback:
             if not os.path.exists(pred_dir):
                 os.makedirs(pred_dir)
             print("Get miou.")
-            for image_id in tqdm(self.image_ids):
+            for image_id in track(self.image_ids):
                 # -------------------------------#
                 #   从文件中读取图像
                 # -------------------------------#

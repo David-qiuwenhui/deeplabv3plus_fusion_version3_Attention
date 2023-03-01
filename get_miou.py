@@ -1,10 +1,12 @@
 import os
 
 from PIL import Image
-from tqdm import tqdm
+from rich.progress import track
+
 
 from deeplab_segmentation import DeeplabV3_Segmentation
 from utils.utils_metrics import compute_mIoU, show_results
+
 
 """
 进行指标评估需要注意以下几点：
@@ -90,7 +92,7 @@ def main(val_cfg):
         print("💾💾💾 Load model done")
 
         print("---------- Get predict result ----------")
-        for image_id in tqdm(image_ids):
+        for image_id in track(image_ids):
             image_path = os.path.join(
                 SUIMdevkit_path, "SUIM2022/JPEGImages/" + image_id + ".jpg"
             )

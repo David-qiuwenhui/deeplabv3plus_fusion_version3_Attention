@@ -264,7 +264,7 @@ class DeeplabV3_Segmentation(object):
         return image
 
     def get_FPS(self, image, test_interval):
-        from tqdm import tqdm
+        from rich.progress import track
 
         # ---------------------------------------------------------#
         #   在这里将图像转换成RGB图像，防止灰度图在预测时报错。
@@ -313,7 +313,7 @@ class DeeplabV3_Segmentation(object):
             ]
 
         t1 = time_synchronized()
-        for _ in tqdm(range(test_interval)):
+        for _ in track(range(test_interval)):
             with torch.no_grad():
                 # ---------------------------------------------------#
                 #   图片传入网络进行预测
