@@ -39,8 +39,8 @@ val_cfg = dict(
     cuda=True,
     # ---------- 文件夹的位置参数 ----------
     dataset_path="../../dataset/SUIMdevkit",
-    file_name="train.txt",
-    save_file_dir="./miou_out_train_485",
+    file_name="val.txt",
+    save_file_dir="./miou_out_val_485",
 )
 
 
