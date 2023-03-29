@@ -168,13 +168,13 @@ class RepVGGplusBlock(nn.Module):
             # self.post_se = BAMBlock(
             #     channel=out_channels, reduction=8, kernel=3, dia_val=[1, 2, 3]
             # )
-            # self.post_se = SKAttention(
-            #     channel=out_channels, kernels=[5, 7, 9], reduction=8
-            # )
+            self.post_se = SKAttention(
+                channel=out_channels, kernels=[5, 7, 9], reduction=8
+            )
             # self.post_se = cbam_block(
             #     channel=out_channels, ratio=4, kernel_size=7
             # )
-            self.post_se = SEBlock(out_channels, internal_neurons=out_channels // 4)
+            # self.post_se = SEBlock(out_channels, internal_neurons=out_channels // 4)
         else:
             self.post_se = nn.Identity()
 
@@ -929,7 +929,8 @@ def deeplabv3plus_fusion_backbone():
         baseblock_use_hs=False,
         baseblock_use_se=False,
         deploy=False,
-        repvgg_use_se=[True, True, True, True],
+        repvgg_use_se=[False, False, True, False],
+        # repvgg_use_se=[True, True, True, True],
     )
 
     bneck_conf = partial(InvertedResidualConfig, width_multi=model_cfg["width_multi"])

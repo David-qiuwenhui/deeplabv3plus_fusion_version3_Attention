@@ -120,8 +120,9 @@ class DeeplabV3_Segmentation(object):
         # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # 载入训练完成的模型权重
+        # TODO
         self.net.load_state_dict(
-            torch.load(self.model_path, map_location=device), strict=False
+            torch.load(self.model_path, map_location=device), strict=True
         )
         # repvgg切换到部署模式需要先载入模型的训练权重参数 再切换成部署模式
         if self.deploy:

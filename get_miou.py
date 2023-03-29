@@ -24,7 +24,8 @@ val_cfg = dict(
     # last_epoch_weights.pth
     model_path="./logs/deeplabv3plus_fusion/02_deeplabv3plus_fusion_version3_MobileVit_d4_Normal_sknet_500epochs_bs16_adam/ep485-loss0.235-val_loss0.426.pth",
     backbone="deeplabv3plus_fusion",
-    aux_branch=False,
+    # TODO
+    aux_branch=True,
     num_classes=7,
     name_classes=[
         "Background_waterbody",
@@ -42,7 +43,7 @@ val_cfg = dict(
     # ---------- 文件夹的位置参数 ----------
     dataset_path="../../dataset/SUIMdevkit",
     file_name="val.txt",
-    save_file_dir="./miou_out_val_485",
+    save_file_dir="./miou_out_val_sknet_485_test",
 )
 
 
